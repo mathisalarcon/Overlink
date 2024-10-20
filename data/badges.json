@@ -1,0 +1,9 @@
+{
+    "welcome": {
+        "slug": "welcome",
+        "name": { "en": "Welcome", "fr": "Bienvenue" },
+        "description": { "fr": "Félicitations pour avoir rejoint Overlink ! Ce badge marque votre première connexion à notre réseau.", "en": "Congratulations on joining Overlink! This badge marks your first connection to our network." },
+        "emoji": "👋",
+        "color": "Yellow"
+    }
+}

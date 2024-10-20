@@ -1,0 +1,8 @@
+{
+    "login": {
+        "messageChannelId": "1297316606690459828"
+    },
+    "database": {
+        "filePath": "~/data/database.sqlite"
+    }
+}
