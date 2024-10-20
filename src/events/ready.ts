@@ -13,7 +13,7 @@ export default async function (client: Client) {
     await sendLoginMessage(client);
     success('[LOGIN] Login message sent');
 
-	info(`Logged in as ${client.user?.tag}`);
+    info(`Logged in as ${client.user?.tag}`);
 }
 
 function runSlogans(client: Client) {

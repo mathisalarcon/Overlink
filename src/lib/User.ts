@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import { Client, Collection } from 'discord.js';
 import { QuickDB } from 'quick.db';
 import { OverlinkBadgeData, OverlinkUserBadgeManager } from './Badge';
 import { OverlinkStatisticsManager } from './UserStatistics';
@@ -10,7 +10,7 @@ export type OverlinkUserData = {
     reputation: number;
     badges: OverlinkBadgeData[];
     connections: OverlinkUserConnectionData[];
-    statistics: OverlinkStatisticsData;
+    // statistics: OverlinkStatisticsData;
     // preferences: OverlinkPreferencesData;
 }
 
@@ -38,4 +38,17 @@ export class OverlinkUser {
 	}
 };
 
-export class OverlinkUserManager {};
+export class OverlinkUserManager {
+    private self: Database;
+    private client: Client;
+    private db: QuickDB;
+
+    cache: Collection<string, OverlinkUser>;
+
+    constructor(self: Database, client: Client, db: QuickDB, data: OverlinkUserData[]) {
+        this.self = self;
+        this.client = client;
+        this.db = db;
+        this.cache = new Collection(data.map((user) => [user.id, new OverlinkUser(self, client, db, user)]));
+    };
+};
