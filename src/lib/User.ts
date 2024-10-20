@@ -9,7 +9,7 @@ export type OverlinkUserData = {
     id: string;
     reputation: number;
     badges: OverlinkBadgeData[];
-    connections: OverlinkUserConnectionData[];
+    connections: { [userId: string]: OverlinkUserConnectionData };
     // statistics: OverlinkStatisticsData;
     // preferences: OverlinkPreferencesData;
 }
@@ -34,8 +34,16 @@ export class OverlinkUser {
         this.badges = new OverlinkUserBadgeManager(this.self, client, db, this, data.badges);
         this.statistics = new OverlinkStatisticsManager(this.self, client, db, this);
         this.connections = new OverlinkUserConnectionManager(this.self, client, db, this, data.connections);
-        this.statistics.reputation = data.reputation;
-	}
+    }
+    
+    toJSON(): OverlinkUserData {
+        return {
+            id: this.id,
+            reputation: this.statistics.reputation,
+            badges: this.badges.cache.map((badge) => badge.toJSON()),
+            connections: this.connections.toJSON()
+        };
+    }
 };
 
 export class OverlinkUserManager {
@@ -51,4 +59,17 @@ export class OverlinkUserManager {
         this.db = db;
         this.cache = new Collection(data.map((user) => [user.id, new OverlinkUser(self, client, db, user)]));
     };
+
+    async create(id: string) {
+        const user = new OverlinkUser(this.self, this.client, this.db, {
+            id,
+            reputation: 0,
+            badges: [],
+            connections: {}
+        });
+
+        this.cache.set(id, user);
+        await this.db.set(`users.${id}`, user.toJSON());
+        return user;
+    }
 };

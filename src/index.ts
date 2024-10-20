@@ -1,9 +1,9 @@
-import { Client, GatewayIntentBits, IntentsBitField, Partials } from "discord.js";
+import { Client, Collection, CommandInteraction, GatewayIntentBits, IntentsBitField, Partials, SlashCommandBuilder } from "discord.js";
 import "module-alias/register";
 import { config } from "dotenv";
 import path from "path";
 import fs from "fs";
-import Database from "@/lib/Database";
+import { info } from "console";
 
 config();
 
@@ -12,7 +12,9 @@ let client = new Client({
     partials: Object.values(Partials) as Partials[]
 });
 
-client.db = new Database();
+client.ready = false;
+client.commands = new Collection();
+client.getEmoji = (name: string) => client.application.emojis.cache.find(e => e.name == name)?.toString() || name || '';
 
 function loadEvents(dir = path.join(__dirname, "events")) {
     if (!fs.existsSync(dir)) return;

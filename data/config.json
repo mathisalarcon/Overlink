@@ -1,8 +1,80 @@
 {
-    "login": {
-        "messageChannelId": "1297316606690459828"
-    },
-    "database": {
-        "filePath": "~/data/database.sqlite"
-    }
+	"login": {
+		"messageChannelId": "1297316606690459828"
+	},
+	"database": {
+		"filePath": "~/data/database.sqlite"
+	},
+	"reputation": {
+		"message": {
+			"earnPerMessage": 1,
+			"maxPerMessage": 5,
+			"earnRatio": 0.1
+		}
+	},
+	"commands": {
+		"categories": {
+			"General": {
+				"fr": "Général",
+				"emoji": "bookmark",
+				"enabled": true
+			},
+			"About the bot": {
+				"fr": "A propos du bot",
+				"emoji": "about",
+				"enabled": true
+			},
+			"Reputation": {
+				"fr": "Réputation",
+				"emoji": "reputation",
+				"enabled": true
+			},
+			"Connection & Network": {
+				"fr": "Connexion & Réseau",
+				"emoji": "neural",
+				"enabled": true
+			}
+		}
+	},
+	"credits": {
+		"staff": {
+			"emoji": "💼",
+			"name": "Staff",
+			"developers": [{
+				"discordId": "950134859639160872",
+				"role": "Lead Developer"
+			}]
+		},
+		"design": {
+			"emoji": "🎨",
+			"name": "Design",
+			"users": [],
+			"platforms": [{
+				"name": "Flaticon",
+				"url": "https://www.flaticon.com/",
+				"emoji": "flaticon",
+				"role": "Free Icons"
+			}]
+		},
+		"technologies": {
+			"emoji": "🖥️",
+			"name": "Technologies",
+			"list": [{
+				"name": "Node.js",
+				"url": "https://nodejs.org/",
+				"emoji": "nodejs",
+				"role": "JavaScript Runtime"
+			},{
+				"name": "Discord.js",
+				"url": "https://discord.js.org/",
+				"emoji": "discordjs",
+				"role": "Discord API Wrapper"
+			},{
+				"name": "SQLite",
+				"url": "https://www.sqlite.org/",
+				"emoji": "sql",
+				"role": "Database Engine"
+			}]
+		}
+	}
 }

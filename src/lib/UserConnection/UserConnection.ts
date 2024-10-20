@@ -51,7 +51,11 @@ export class OverlinkUserConnectionInteractionManager {
             createdTimestamp: Date.now(),
             type
         });
-        await this.db.set(`users.${this.selfUser.id}.connections.${this.connection.user.id}.interactions`, this.cache.map((interaction) => interaction));
+        await this.db.set(`users.${this.selfUser.id}.connections.${this.connection.user.id}.interactions`, Array.from(this.cache.values()));
+    }
+
+    toJSON(): OverlinkUserConnectionInteractionData[] {
+        return Array.from(this.cache.values());
     }
 }
 
@@ -59,9 +63,9 @@ export class OverlinkUserConnection {
     private self: Database;
 	private client: Client;
 	private db: QuickDB;
-	private selfUser: OverlinkUser;
+    private selfUser: OverlinkUser;
+    private data: OverlinkUserConnectionData;
 
-	user: OverlinkUser;
 	interactions: OverlinkUserConnectionInteractionManager;
 
     constructor(self: Database, client: Client, db: QuickDB, selfUser: OverlinkUser, data: OverlinkUserConnectionData) {
@@ -69,13 +73,24 @@ export class OverlinkUserConnection {
 		this.client = client;
 		this.db = db;
         this.selfUser = selfUser;
-        this.user = this.self.users.cache.get(data.userId);
+        this.data = data;
         this.interactions = new OverlinkUserConnectionInteractionManager(self, client, db, selfUser, this, data.interactions);
-	}
+    }
+    
+    get user(): OverlinkUser {
+        return this.self.users.cache.get(this.data.userId);
+    }
 
 	get weight(): number {
 		return this.interactions.cache.reduce((acc, interaction) => acc + interaction.weight, 0);
-	}
+    }
+    
+    toJSON(): OverlinkUserConnectionData {
+        return {
+            userId: this.user.id,
+            interactions: this.interactions.toJSON()
+        };
+    }
 }
 
 export class OverlinkUserConnectionManager {
@@ -86,15 +101,32 @@ export class OverlinkUserConnectionManager {
 
     cache: Collection<string, OverlinkUserConnection>;
 
-    constructor(self: Database, client: Client, db: QuickDB, selfUser: OverlinkUser, data: OverlinkUserConnectionData[]) {
+    constructor(self: Database, client: Client, db: QuickDB, selfUser: OverlinkUser, data: { [userId: string]: OverlinkUserConnectionData }) {
         this.self = self;
         this.client = client;
         this.db = db;
         this.selfUser = selfUser;
-        this.cache = new Collection(data.map((connection) => [connection.userId, new OverlinkUserConnection(this.self, client, db, selfUser, connection)]));
+        this.cache = new Collection(Object.entries(data).map(([userId, connectionData]) => [userId, new OverlinkUserConnection(self, client, db, selfUser, connectionData)]));
     }
 
-    get(user: OverlinkUser): OverlinkUserConnection {
-        return this.cache.get(user.id) as OverlinkUserConnection;
+    async create(targetId: string) {
+        if(!this.self.users.cache.has(targetId)) await this.self.users.create(targetId);
+        const connection = new OverlinkUserConnection(this.self, this.client, this.db, this.selfUser, {
+            userId: targetId,
+            interactions: []
+        });
+
+        this.cache.set(targetId, connection);
+        await this.db.set(`users.${this.selfUser.id}.connections.${targetId}`, connection.toJSON());
+        return connection;
+    }
+
+    toJSON(): { [userId: string]: OverlinkUserConnectionData } {
+        return Object.fromEntries(
+			this.cache.map((connection) => [
+				connection.user.id,
+				connection.toJSON(),
+			])
+		);
     }
 }
